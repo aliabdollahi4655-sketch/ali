@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماشین حساب ساده</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            direction: rtl;
+        }
+        .calculator-btn {
+            transition: all 0.2s;
+        }
+        .calculator-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <div class="p-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <h1 class="text-2xl font-bold text-center mb-2">ماشین حساب ساده</h1>
+            <div id="display" class="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-right h-16 flex items-center justify-end text-3xl font-bold overflow-x-auto">0</div>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-2 p-4 bg-gray-50">
+            <button class="calculator-btn bg-red-500 hover:bg-red-600 text-white py-4 rounded-lg text-xl font-bold" onclick="clearDisplay()">C</button>
+            <button class="calculator-btn bg-gray-200 hover:bg-gray-300 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('(')">(</button>
+            <button class="calculator-btn bg-gray-200 hover:bg-gray-300 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay(')')">)</button>
+            <button class="calculator-btn bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('/')">/</button>
+            
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('7')">7</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('8')">8</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('9')">9</button>
+            <button class="calculator-btn bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('*')">×</button>
+            
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('4')">4</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('5')">5</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('6')">6</button>
+            <button class="calculator-btn bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('-')">-</button>
+            
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('1')">1</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('2')">2</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('3')">3</button>
+            <button class="calculator-btn bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('+')">+</button>
+            
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('0')">0</button>
+            <button class="calculator-btn bg-gray-100 hover:bg-gray-200 py-4 rounded-lg text-xl font-bold" onclick="appendToDisplay('.')">.</button>
+            <button class="calculator-btn bg-gray-200 hover:bg-gray-300 py-4 rounded-lg text-xl font-bold" onclick="backspace()">⌫</button>
+            <button class="calculator-btn bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg text-xl font-bold" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let displayValue = '0';
+        const display = document.getElementById('display');
+        
+        function updateDisplay() {
+            display.textContent = displayValue;
+        }
+        
+        function appendToDisplay(value) {
+            if (displayValue === '0' && value !== '.') {
+                displayValue = value;
+            } else {
+                displayValue += value;
+            }
+            updateDisplay();
+        }
+        
+        function clearDisplay() {
+            displayValue = '0';
+            updateDisplay();
+        }
+        
+        function backspace() {
+            if (displayValue.length > 1) {
+                displayValue = displayValue.slice(0, -1);
+            } else {
+                displayValue = '0';
+            }
+            updateDisplay();
+        }
+        
+        function calculate() {
+            try {
+                // استفاده از کتابخانه math.js برای محاسبات امن
+                const result = math.evaluate(displayValue);
+                
+                // فرمت‌بندی نتیجه
+                if (Number.isInteger(result)) {
+                    displayValue = result.toString();
+                } else {
+                    // حذف اعشارهای اضافی
+                    displayValue = parseFloat(result.toFixed(8)).toString();
+                }
+                
+                updateDisplay();
+            } catch (error) {
+                displayValue = 'Error';
+                updateDisplay();
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+        
+        // پشتیبانی از کیبورد
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            
+            if (/[0-9]/.test(key)) {
+                appendToDisplay(key);
+            } else if (['+', '-'].includes(key)) {
+                appendToDisplay(key);
+            } else if (key === '*') {
+                appendToDisplay('*');
+            } else if (key === '/') {
+                appendToDisplay('/');
+            } else if (key === '.') {
+                appendToDisplay('.');
+            } else if (key === 'Enter') {
+                calculate();
+            } else if (key === 'Backspace') {
+                backspace();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            } else if (key === '(' || key === ')') {
+                appendToDisplay(key);
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9698053f636f1cb9',t:'MTc1NDI0NzIzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
